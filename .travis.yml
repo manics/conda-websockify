@@ -1,0 +1,41 @@
+---
+language: generic
+
+matrix:
+  include:
+    - os: linux
+      env: PYTHON=3.6
+    - os: linux
+      env: PYTHON=3.7
+
+env:
+  global:
+    - PACKAGE_NAME=websockify
+    - PATH="$HOME/miniconda/bin:$PATH"
+
+install:
+  - wget -q https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+  - bash miniconda.sh -b -p $HOME/miniconda && rm miniconda.sh
+  - conda install -y conda-build anaconda-client
+  - conda info -a
+
+script:
+  # Override the version string for dev builds
+  - if [ -z "${TRAVIS_TAG}" ]; then
+      export VERSION_SUFFIX=".${TRAVIS_BRANCH}";
+    else
+      export VERSION_SUFFIX="";
+    fi
+  - conda build --python $PYTHON .
+
+deploy:
+  - provider: script
+    skip_cleanup: true
+    script: anaconda -t $CONDA_UPLOAD_TOKEN upload $HOME/miniconda/conda-bld/$TRAVIS_OS_NAME-64/$PACKAGE_NAME-*.tar.bz2 --force -l testing
+    on:
+      branch: master
+  - provider: script
+    skip_cleanup: true
+    script: anaconda -t $CONDA_UPLOAD_TOKEN upload $HOME/miniconda/conda-bld/$TRAVIS_OS_NAME-64/$PACKAGE_NAME-*.tar.bz2
+    on:
+      tags: true

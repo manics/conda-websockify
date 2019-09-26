@@ -1,0 +1,46 @@
+{% set name = "websockify" %}
+{% set version = "0.9.0" %}
+
+package:
+  name: "{{ name|lower }}"
+  version: "{{ version }}{{ environ.get('VERSION_SUFFIX', '') }}"
+
+source:
+  url: https://github.com/novnc/websockify/archive/v{{ version }}.tar.gz
+  sha256: 6ebfec791dd78be6584fb5fe3bc27f02af54501beddf8457368699f571de13ae
+
+build:
+  # Independent of Python version, but rebind.so depends on OS
+  number: 0
+  entry_points:
+    - websockify = websockify.websocketproxy:websockify_init
+  script_env:
+    - VERSION_SUFFIX
+
+requirements:
+  host:
+    - {{ compiler('c') }}
+    - pip
+    - python
+  run:
+    - numpy
+    - python
+
+test:
+  imports:
+    - websockify
+  commands:
+    - websockify --help
+    - websockify 12345 -- ls
+
+about:
+  home: "https://github.com/novnc/websockify"
+  license: "LGPLv3"
+  license_family: "LGPL"
+  summary: "Websockify is a WebSocket to TCP proxy/bridge. This allows a browser to connect to any application/server/service.."
+  doc_url: "https://github.com/novnc/websockify"
+  dev_url: "https://github.com/novnc/websockify"
+
+extra:
+  recipe-maintainers:
+    - ome
