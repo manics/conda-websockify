@@ -11,7 +11,7 @@ source:
 
 build:
   # Independent of Python version, but rebind.so depends on OS
-  number: 1
+  number: 2
   entry_points:
     - websockify = websockify.websocketproxy:websockify_init
   script_env:
